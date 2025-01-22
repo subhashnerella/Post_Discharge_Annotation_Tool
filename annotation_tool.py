@@ -200,9 +200,8 @@ def annotation_tool():
             st.error("Please fill out the question and at least one comment.")
 
     if st.button("Logout"):
-        for key in ['logged_in', 'username', 'comments', 'selected_tags']:
-            if key in st.session_state:
-                del st.session_state[key]
+        for key in list(st.session_state.keys()):
+            del st.session_state[key]
         st.rerun()
 
 # Main app logic
