@@ -9,7 +9,7 @@ import os
 st.set_page_config(layout="wide")
 
 # Connect to MongoDB
-uri = os.getenv("MONGO_URI")
+uri = st.secrets["MONGODB_URI"]
 
 client = MongoClient(uri, server_api=ServerApi('1'))
 db = client["Post_Discharge"]
