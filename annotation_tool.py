@@ -82,7 +82,7 @@ def annotation_tool():
     if 'selected_tags' not in st.session_state:
         st.session_state['selected_tags'] = []
     if 'comments' not in st.session_state:
-        st.session_state['comments'] = []
+        st.session_state['comments'] = [{"comment": "", "role": "", "is_question": False, "sub_comments": []}]
 
     # Left column: Query and comments
     with left_column:
@@ -92,7 +92,7 @@ def annotation_tool():
 
         st.subheader("Comments")
         for idx, comment_data in enumerate(st.session_state['comments']):
-            comment_col, role_col = st.columns(2)
+            comment_col, role_col = st.columns([3,1])
             with comment_col:
                 st.session_state['comments'][idx]['comment'] = st.text_area(
                     f"Enter the comment {idx + 1}", 
@@ -100,6 +100,11 @@ def annotation_tool():
                     key=f"comment_{idx}"
                 )
             with role_col:
+                st.session_state['comments'][idx]['is_question'] = st.toggle(
+                    "Is Question?",
+                    value=comment_data.get('is_question', False),
+                    key=f"is_question_{idx}"
+                )
                 st.session_state['comments'][idx]['role'] = st.selectbox(
                     f"Select role for comment {idx + 1}",
                     [""] + st.session_state['roles'],
@@ -110,7 +115,7 @@ def annotation_tool():
             # Sub-comments section
             st.markdown(f"**Sub-comments for Comment {idx + 1}:**")
             for sub_idx, sub_comment in enumerate(comment_data.get('sub_comments', [])):
-                sub_comment_col, sub_role_col = st.columns(2)
+                sub_comment_col, sub_role_col = st.columns([3,1])
                 with sub_comment_col:
                     comment_data['sub_comments'][sub_idx]['comment'] = st.text_area(
                         f"Sub-comment {sub_idx + 1} for Comment {idx + 1}", 
@@ -118,12 +123,18 @@ def annotation_tool():
                         key=f"sub_comment_{idx}_{sub_idx}"
                     )
                 with sub_role_col:
+                    comment_data['sub_comments'][sub_idx]['is_question'] = st.toggle(
+                            "Is Question?",
+                            value=sub_comment.get('is_question', False),
+                            key=f"sub_is_question_{idx}_{sub_idx}"
+                        )
                     comment_data['sub_comments'][sub_idx]['role'] = st.selectbox(
                         f"Select role for Sub-comment {sub_idx + 1} of Comment {idx + 1}",
                         [""] + st.session_state['roles'],
                         index=st.session_state['roles'].index(sub_comment['role']) + 1 if 'role' in sub_comment and sub_comment['role'] else 0,
                         key=f"sub_role_{idx}_{sub_idx}"
                     )
+
 
             if st.button(f"Add Sub-comment to Comment {idx + 1}", key=f"add_sub_comment_{idx}"):
                 comment_data.setdefault('sub_comments', []).append({"comment": "", "role": ""})
